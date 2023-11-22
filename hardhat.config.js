@@ -1,14 +1,19 @@
 require("@nomiclabs/hardhat-waffle");
-
+require('@nomiclabs/hardhat-ethers');
+require('hardhat-etherscan');
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
-
+const ALCHEMY_API_KEY = '8GRZ40nx_GtdjcthT7UB-xitSAbW7RPJ';
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
   defaultNetwork: "hardhat",
   networks: {
+    alchemy: {
+      url: 'https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}',
+      accounts: [],
+    },
     hardhat: {
       chainId: 1,
       mining: {

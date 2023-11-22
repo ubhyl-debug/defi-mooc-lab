@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.7;
 
-import "hardhat/console.sol";
+//import "hardhat/console.sol";
 
 // ----------------------INTERFACE------------------------------
 
@@ -136,7 +136,10 @@ contract LiquidationOperator is IUniswapV2Callee {
     uint8 public constant health_factor_decimals = 18;
 
     // TODO: define constants used in the contract including ERC-20 tokens, Uniswap Pairs, Aave lending pools, etc. */
-    //    *** Your code here ***
+    // address constant usdtAddress = [USDT Token address];
+    // address constant wbtcAddress = [WBTC Token address];
+    // address constant uniswapRouterAddress = [UniSwap Router address];
+    // address constant aaveLendingPoolAddress = [Aave lending pool address];
     // END TODO
 
     // some helper function, it is totally fine if you can finish the lab without using these function
@@ -179,12 +182,21 @@ contract LiquidationOperator is IUniswapV2Callee {
 
     constructor() {
         // TODO: (optional) initialize your contract
-        //   *** Your code here ***
+        // approving token alliances
+        // setting up initial parameters
+        // interacting with other contracts
+        // END TODO
+    }
+
+    receive() external payable {
+        // TODO:
+        // handle receipt of WETH
         // END TODO
     }
 
     // TODO: add a `receive` function so that you can withdraw your WETH
-    //   *** Your code here ***
+    // receive Ether when it is directly sent to the contract
+    // handles the withdrawal of WETH
     // END TODO
 
     // required by the testing script, entry for your liquidation call
@@ -192,20 +204,27 @@ contract LiquidationOperator is IUniswapV2Callee {
         // TODO: implement your liquidation logic
 
         // 0. security checks and initializing variables
-        //    *** Your code here ***
+        // 0.1 check if contract has sufficient funds
+        // 0.2 ensure contract has sufficient funds
+        // 0.3 ensure flash loan amounts is within acceptable limits
 
         // 1. get the target user account data & make sure it is liquidatable
-        //    *** Your code here ***
+        // 1.1 call getUserAccountData function on the Aave lending pool 
+        // to retrieve information about the target user's account 
+        // 1.2 check if account is liquidable based on health factor
 
         // 2. call flash swap to liquidate the target user
         // based on https://etherscan.io/tx/0xac7df37a43fab1b130318bbb761861b8357650db2e2c6493b73d6da3d9581077
         // we know that the target user borrowed USDT with WBTC as collateral
         // we should borrow USDT, liquidate the target user and get the WBTC, then swap WBTC to repay uniswap
         // (please feel free to develop other workflows as long as they liquidate the target user successfully)
-        //    *** Your code here ***
+        // 2.1 implement flash loan logic - interaction with Aave lending pool, UniSwap router, and others
+        // borrow USDT with WBTC as collateral, 
+        // liquidate target user and get WBTC, 
+        // swap WBTC to repay UniSwap
 
-        // 3. Convert the profit into ETH and send back to sender
-        //    *** Your code here ***
+        // 3.1 Convert the profit into ETH and 
+        // 3.2 send back to sender
 
         // END TODO
     }
@@ -220,17 +239,18 @@ contract LiquidationOperator is IUniswapV2Callee {
         // TODO: implement your liquidation logic
 
         // 2.0. security checks and initializing variables
-        //    *** Your code here ***
+        // similar to initial security checks
+        // potentially more?
 
         // 2.1 liquidate the target user
-        //    *** Your code here ***
+        // call liquidationCall function on the Aave Lending pool
 
-        // 2.2 swap WBTC for other things or repay directly
-        //    *** Your code here ***
+        // 2.2 (swap WBTC for other things or) repay directly
+        // repay directly
 
         // 2.3 repay
-        //    *** Your code here ***
-        
+        // repay outstanding amounts, ensuring that flash loan is settled
+
         // END TODO
     }
 }

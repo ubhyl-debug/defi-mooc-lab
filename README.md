@@ -25,7 +25,7 @@ You are expected to liquidate `0x59CE4a2AC5bC3f5F225439B2993b86B42f6d3e9F` on Aa
 ### Commands
 To test your contract:
 1. `docker build -t defi-mooc-lab2 .`
-2. `docker run -e ALCHE_API="$YOUR ALCHEMY ETHEREUM MAINNET API" -it defi-mooc-lab2 npm test`
+2. `docker run -e ALCHE_API="https://eth-mainnet.g.alchemy.com/v2/8GRZ40nx_GtdjcthT7UB-xitSAbW7RPJ" -it defi-mooc-lab2 npm test`
 
 ### Grading
 
