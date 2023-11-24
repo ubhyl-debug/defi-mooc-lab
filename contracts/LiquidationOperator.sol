@@ -136,10 +136,10 @@ contract LiquidationOperator is IUniswapV2Callee {
     uint8 public constant health_factor_decimals = 18;
 
     // TODO: define constants used in the contract including ERC-20 tokens, Uniswap Pairs, Aave lending pools, etc. */
-    // address constant usdtAddress = [USDT Token address];
-    // address constant wbtcAddress = [WBTC Token address];
-    // address constant uniswapRouterAddress = [UniSwap Router address];
-    // address constant aaveLendingPoolAddress = [Aave lending pool address];
+    address constant usdtAddress = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
+    address constant wbtcAddress = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
+    address constant uniswapRouterAddress = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
+    address constant aaveLendingPoolAddress = 0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9;
     // END TODO
 
     // some helper function, it is totally fine if you can finish the lab without using these function
@@ -189,10 +189,10 @@ contract LiquidationOperator is IUniswapV2Callee {
     }
 
     receive() external payable {
-        // TODO:
-        // handle receipt of WETH
-        // END TODO
+    // Deposit received Ether into WETH
+    // IWETH(wethAddress).deposit{value: msg.value}();
     }
+
 
     // TODO: add a `receive` function so that you can withdraw your WETH
     // receive Ether when it is directly sent to the contract
@@ -201,42 +201,71 @@ contract LiquidationOperator is IUniswapV2Callee {
 
     // required by the testing script, entry for your liquidation call
     function operate() external {
-        // TODO: implement your liquidation logic
+    // 0. security checks and initializing variables
+    require(address(this).balance >= 0.1 ether, "Insufficient contract balance for gas fees");
+    // require(msg.sender == accounts[0], "Sender must be accounts[0]");
+    
+    // 1. get the target user account data & make sure it is liquidatable
+    (
+        uint256 totalCollateralETH,
+        uint256 totalDebtETH,
+        uint256 availableBorrowsETH,
+        uint256 currentLiquidationThreshold,
+        uint256 ltv,
+        uint256 healthFactor
+    ) = ILendingPool(aaveLendingPoolAddress).getUserAccountData(address(this));
+    
+    // 1.1 check if account is liquidable based on health factor
+    require(healthFactor < 19, "Health factor is not below 19npm , no liquidation needed");
 
-        // 0. security checks and initializing variables
-        // 0.1 check if contract has sufficient funds
-        // 0.2 ensure contract has sufficient funds
-        // 0.3 ensure flash loan amounts is within acceptable limits
+    // Borrow USDT with WBTC as collateral
+    ILendingPool(aaveLendingPoolAddress).liquidationCall(wbtcAddress, usdtAddress, address(this), totalDebtETH, false);
+    
+    // 2. call flash swap to liquidate the target user
+    // 2.1 implement flash loan logic - interaction with Aave lending pool, UniSwap router, and others
+    
+    // liquidate target user and get WBTC, 
+    // swap WBTC to repay UniSwap --> call swap function
 
-        // 1. get the target user account data & make sure it is liquidatable
-        // 1.1 call getUserAccountData function on the Aave lending pool 
-        // to retrieve information about the target user's account 
-        // 1.2 check if account is liquidable based on health factor
+    // 3.1 Convert the profit into ETH and 
+    // 3.2 send back to sender
+    uint256 wbtcBalance = IERC20(wbtcAddress).balanceOf(address(this));
 
-        // 2. call flash swap to liquidate the target user
-        // based on https://etherscan.io/tx/0xac7df37a43fab1b130318bbb761861b8357650db2e2c6493b73d6da3d9581077
-        // we know that the target user borrowed USDT with WBTC as collateral
-        // we should borrow USDT, liquidate the target user and get the WBTC, then swap WBTC to repay uniswap
-        // (please feel free to develop other workflows as long as they liquidate the target user successfully)
-        // 2.1 implement flash loan logic - interaction with Aave lending pool, UniSwap router, and others
-        // borrow USDT with WBTC as collateral, 
-        // liquidate target user and get WBTC, 
-        // swap WBTC to repay UniSwap
+    // Swap WBTC for ETH
 
-        // 3.1 Convert the profit into ETH and 
-        // 3.2 send back to sender
+    // Get the expected amount of ETH after the swap
+    //uint[] memory amountsOut = IUniswapV2Router(uniswapRouterAddress).getAmountsOut(wbtcBalance, path);
 
-        // END TODO
-    }
+    // Swap WBTC for ETH
+    //IUniswapV2Router(uniswapRouterAddress).swapExactTokensForETH(
+    //    wbtcBalance,
+    //    amountsOut[1],
+    //     path,
+    //     address(this),
+    //     block.timestamp
+    // );
+
+    // Send the obtained ETH back to the sender
+    payable(msg.sender).transfer(address(this).balance);
+
+    // Emit an event or log to indicate successful liquidation and profit conversion
+    //emit LiquidationSuccessful(msg.sender, wbtcBalance, amountsOut[1]);
+}
+
 
     // required by the swap
     function uniswapV2Call(
-        address,
-        uint256,
+        address sender,
+        uint256 amount0,
         uint256 amount1,
-        bytes calldata
+        bytes calldata data
     ) external override {
+        address wbtcAddress;
+        address usdtAddress;
+        uint256 amountBought;
+        uint256 amountSold; 
         // TODO: implement your liquidation logic
+        (wbtcAddress, usdtAddress, amountBought, amountSold) = abi.decode(data, (address, address, uint256, uint256));
 
         // 2.0. security checks and initializing variables
         // similar to initial security checks
