@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.7;
-
-//import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 // ----------------------INTERFACE------------------------------
 
@@ -198,13 +197,11 @@ contract LiquidationOperator is IUniswapV2Callee {
     // receive Ether when it is directly sent to the contract
     // handles the withdrawal of WETH
     // END TODO
-
     // required by the testing script, entry for your liquidation call
     function operate() external {
     // 0. security checks and initializing variables
     require(address(this).balance >= 0.1 ether, "Insufficient contract balance for gas fees");
     // require(msg.sender == accounts[0], "Sender must be accounts[0]");
-    
     // 1. get the target user account data & make sure it is liquidatable
     (
         uint256 totalCollateralETH,
