@@ -1,6 +1,5 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.7;
-
 import "hardhat/console.sol";
 
 // ----------------------INTERFACE------------------------------
@@ -185,7 +184,8 @@ contract LiquidationOperator is IUniswapV2Callee {
     }
 
     // TODO: add a `receive` function so that you can withdraw your WETH
-    //   *** Your code here ***
+    // receive Ether when it is directly sent to the contract
+    // handles the withdrawal of WETH
     // END TODO
    //event HealthFactorLogged(uint256 healthFactor);
     event AccountDataLogged(
@@ -236,25 +236,31 @@ contract LiquidationOperator is IUniswapV2Callee {
 
     // required by the swap
     function uniswapV2Call(
-        address,
-        uint256,
+        address sender,
+        uint256 amount0,
         uint256 amount1,
-        bytes calldata
+        bytes calldata data
     ) external override {
+        address wbtcAddress;
+        address usdtAddress;
+        uint256 amountBought;
+        uint256 amountSold; 
         // TODO: implement your liquidation logic
+        (wbtcAddress, usdtAddress, amountBought, amountSold) = abi.decode(data, (address, address, uint256, uint256));
 
         // 2.0. security checks and initializing variables
-        //    *** Your code here ***
+        // similar to initial security checks
+        // potentially more?
 
         // 2.1 liquidate the target user
-        //    *** Your code here ***
+        // call liquidationCall function on the Aave Lending pool
 
-        // 2.2 swap WBTC for other things or repay directly
-        //    *** Your code here ***
+        // 2.2 (swap WBTC for other things or) repay directly
+        // repay directly
 
         // 2.3 repay
-        //    *** Your code here ***
-        
+        // repay outstanding amounts, ensuring that flash loan is settled
+
         // END TODO
     }
 }
