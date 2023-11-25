@@ -135,6 +135,8 @@ interface IUniswapV2Pair {
 contract LiquidationOperator is IUniswapV2Callee {
     uint8 public constant health_factor_decimals = 18;
     address public targetUser = 0xa61e59faC455EED933405ecDde9928982B478CE7;
+    event HealthFactorLogged(uint256 healthFactor_decimals);
+
 
     // TODO: define constants used in the contract including ERC-20 tokens, Uniswap Pairs, Aave lending pools, etc. */
     address public constant AAVE_LENDING_POOL_ADDRESS = 0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9; 
@@ -179,15 +181,21 @@ contract LiquidationOperator is IUniswapV2Callee {
     }
 
     constructor() {
-        // TODO: (optional) initialize your contract
-        //   *** Your code here ***
-        // END TODO
+        emit HealthFactorLogged(health_factor_decimals);
     }
 
     // TODO: add a `receive` function so that you can withdraw your WETH
     //   *** Your code here ***
     // END TODO
-    event HealthFactorLogged(uint256 healthFactor);
+   //event HealthFactorLogged(uint256 healthFactor);
+    event AccountDataLogged(
+        uint256 totalCollateralETH,
+        uint256 totalDebtETH,
+        uint256 availableBorrowsETH,
+        uint256 currentLiquidationThreshold,
+        uint256 ltv,
+        uint256 healthFactor
+    );
     // required by the testing script, entry for your liquidation call
     function operate() external {
         // TODO: implement your liquidation logic
@@ -202,10 +210,17 @@ contract LiquidationOperator is IUniswapV2Callee {
             uint256 ltv,
             uint256 healthFactor
         ) = ILendingPool(AAVE_LENDING_POOL_ADDRESS).getUserAccountData(targetUser);
-        require(healthFactor > 0, "Health factor not available");
-        require(healthFactor < 1e18, "Target user is not liquidatable");
+        //require(healthFactor > 0, "Health factor not available");
+        //require(healthFactor < 1e18, "Target user is not liquidatable test");
         emit HealthFactorLogged(healthFactor);
-
+        emit AccountDataLogged(
+            totalCollateralETH,
+            totalDebtETH,
+            availableBorrowsETH,
+            currentLiquidationThreshold,
+            ltv,
+            healthFactor
+        );
         // 2. call flash swap to liquidate the target user
         // based on https://etherscan.io/tx/0xac7df37a43fab1b130318bbb761861b8357650db2e2c6493b73d6da3d9581077
         // we know that the target user borrowed USDT with WBTC as collateral
