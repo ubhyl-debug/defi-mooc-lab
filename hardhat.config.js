@@ -10,6 +10,10 @@ module.exports = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
+      forking: {
+        url: "https://eth-mainnet.g.alchemy.com/v2/8GRZ40nx_GtdjcthT7UB-xitSAbW7RPJ", // Replace with your Alchemy API key or any other valid JSON-RPC URL
+        blockNumber: 12489619, // Replace with the desired block number
+      },
       chainId: 1,
       mining: {
         auto: true,

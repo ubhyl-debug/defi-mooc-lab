@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.7;
 
-import "hardhat/console.sol";
+//import "hardhat/console.sol";
 
 // ----------------------INTERFACE------------------------------
 
@@ -134,9 +134,10 @@ interface IUniswapV2Pair {
 
 contract LiquidationOperator is IUniswapV2Callee {
     uint8 public constant health_factor_decimals = 18;
+    address public targetUser = 0xa61e59faC455EED933405ecDde9928982B478CE7;
 
     // TODO: define constants used in the contract including ERC-20 tokens, Uniswap Pairs, Aave lending pools, etc. */
-    //    *** Your code here ***
+    address public constant AAVE_LENDING_POOL_ADDRESS = 0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9; 
     // END TODO
 
     // some helper function, it is totally fine if you can finish the lab without using these function
@@ -192,10 +193,18 @@ contract LiquidationOperator is IUniswapV2Callee {
         // TODO: implement your liquidation logic
 
         // 0. security checks and initializing variables
-        //    *** Your code here ***
 
         // 1. get the target user account data & make sure it is liquidatable
-        //    *** Your code here ***
+        (uint256 totalCollateralETH,
+            uint256 totalDebtETH,
+            uint256 availableBorrowsETH,
+            uint256 currentLiquidationThreshold,
+            uint256 ltv,
+            uint256 healthFactor
+        ) = ILendingPool(AAVE_LENDING_POOL_ADDRESS).getUserAccountData(targetUser);
+        require(healthFactor > 0, "Health factor not available");
+        require(healthFactor < 1e18, "Target user is not liquidatable");
+        console.log("Health Factor:", healthFactor);
 
         // 2. call flash swap to liquidate the target user
         // based on https://etherscan.io/tx/0xac7df37a43fab1b130318bbb761861b8357650db2e2c6493b73d6da3d9581077
