@@ -203,24 +203,24 @@ contract LiquidationOperator is IUniswapV2Callee {
         // 0. security checks and initializing variables
 
         // 1. get the target user account data & make sure it is liquidatable
-        (uint256 totalCollateralETH,
-            uint256 totalDebtETH,
-            uint256 availableBorrowsETH,
-            uint256 currentLiquidationThreshold,
-            uint256 ltv,
-            uint256 healthFactor
-        ) = ILendingPool(AAVE_LENDING_POOL_ADDRESS).getUserAccountData(targetUser);
+        // (uint256 totalCollateralETH,
+        //     uint256 totalDebtETH,
+        //     uint256 availableBorrowsETH,
+        //     uint256 currentLiquidationThreshold,
+        //     uint256 ltv,
+        //     uint256 healthFactor
+        // ) = ILendingPool(AAVE_LENDING_POOL_ADDRESS).getUserAccountData(targetUser);
         //require(healthFactor > 0, "Health factor not available");
         //require(healthFactor < 1e18, "Target user is not liquidatable test");
-        emit HealthFactorLogged(healthFactor);
-        emit AccountDataLogged(
-            totalCollateralETH,
-            totalDebtETH,
-            availableBorrowsETH,
-            currentLiquidationThreshold,
-            ltv,
-            healthFactor
-        );
+         emit HealthFactorLogged(health_factor_decimals);
+        // emit AccountDataLogged(
+        //     totalCollateralETH,
+        //     totalDebtETH,
+        //     availableBorrowsETH,
+        //     currentLiquidationThreshold,
+        //     ltv,
+        //     healthFactor
+        // );
         // 2. call flash swap to liquidate the target user
         // based on https://etherscan.io/tx/0xac7df37a43fab1b130318bbb761861b8357650db2e2c6493b73d6da3d9581077
         // we know that the target user borrowed USDT with WBTC as collateral
